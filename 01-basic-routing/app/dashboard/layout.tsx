@@ -1,4 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: {
+    template: "%s | Dashboard",
+    default: "Dashboard",
+  },
+  description:
+    "Dashboard section for managing analytics, settings, and profile",
+};
 
 const DashboardLayout = ({
   children,

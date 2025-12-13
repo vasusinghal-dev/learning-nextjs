@@ -186,3 +186,229 @@ Otherwise, keep it **server** for better performance.
 | Best For      | Legacy projects     | Modern Next.js apps     |
 
 ---
+
+Perfect notes 👍
+Below is a **clean “Metadata” section** you can directly append to your revision notes.
+It matches the same style: short, factual, revision-friendly.
+
+---
+
+# 🧾 **12. Metadata (SEO & Social Sharing)**
+
+Next.js provides a **Metadata API** to manage `<head>` tags like title, description, and OpenGraph.
+
+Metadata is defined using the `metadata` export in **layout.tsx** or **page.tsx**.
+
+---
+
+## 📌 **Basic Metadata Example**
+
+```ts
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Learning Basic Routing",
+  description: "Understanding basic App Router in Next.js",
+};
+```
+
+- `title` → Browser tab title + SEO
+- `description` → Search engine snippet + previews
+
+---
+
+## ⭐ **Most Common Metadata Fields**
+
+### **1️⃣ title**
+
+```ts
+title: "Dashboard",
+```
+
+Sets the page title.
+
+---
+
+### **2️⃣ description**
+
+```ts
+description: "Dashboard overview and analytics",
+```
+
+Used by search engines and social platforms.
+
+---
+
+### **3️⃣ openGraph**
+
+Used for social media previews (WhatsApp, LinkedIn, Twitter, etc.).
+
+```ts
+openGraph: {
+  title: "Dashboard",
+  description: "Analytics and insights",
+  images: ["/og.png"], // or external URL
+},
+```
+
+---
+
+### **4️⃣ icons**
+
+Controls favicon and app icons.
+
+```ts
+icons: {
+  icon: "/favicon.ico",
+},
+```
+
+⚠️ **Optional**
+If `favicon.ico` exists in `/app` or `/public`, Next.js auto-detects it.
+
+---
+
+### **5️⃣ metadataBase**
+
+Required for generating absolute URLs in OpenGraph.
+
+```ts
+metadataBase: new URL("https://example.com"),
+```
+
+Used mostly in production apps.
+
+---
+
+## 🧠 **Where to Define Metadata**
+
+| Location                   | Effect                        |
+| -------------------------- | ----------------------------- |
+| `app/layout.tsx`           | Global metadata (all pages)   |
+| `app/page.tsx`             | Page-specific metadata        |
+| `app/dashboard/layout.tsx` | Metadata for dashboard routes |
+
+Metadata **merges automatically** from parent to child routes.
+
+---
+
+## 🔁 **Metadata vs React Helmet**
+
+| Feature     | React      | Next.js      |
+| ----------- | ---------- | ------------ |
+| OG Support  | Weak (CSR) | Strong (SSR) |
+| SEO         | Poor       | Excellent    |
+| JS Required | Yes        | No           |
+| Recommended | ❌         | ✅           |
+
+Next.js metadata is **server-rendered**, so social scrapers can read it.
+
+---
+
+# 🧭 **13. Metadata Inheritance & Merging**
+
+Metadata **automatically merges** from parent to child routes.
+
+Example structure:
+
+```
+app/layout.tsx          → global metadata
+app/dashboard/layout.tsx → dashboard metadata
+app/dashboard/page.tsx   → page metadata
+```
+
+---
+
+## 📌 **How Merging Works**
+
+- Child metadata overrides parent
+- Missing fields are inherited
+
+Example:
+
+### `app/layout.tsx`
+
+```ts
+export const metadata = {
+  title: "My App",
+};
+```
+
+### `app/dashboard/page.tsx`
+
+```ts
+export const metadata = {
+  title: "Dashboard",
+};
+```
+
+Final title:
+
+```
+Dashboard
+```
+
+---
+
+## 📌 **Template Titles**
+
+```ts
+export const metadata = {
+  title: {
+    template: "%s | My App",
+    default: "My App",
+  },
+};
+```
+
+Child page title `"Dashboard"` becomes:
+
+```
+Dashboard | My App
+```
+
+---
+
+# 🧠 **14. Metadata vs `<Head>`**
+
+Next.js still supports `<Head>`, but **metadata API is preferred**.
+
+| Feature         | `<Head>` | Metadata API |
+| --------------- | -------- | ------------ |
+| Server-rendered | ❌       | ✅           |
+| SEO-friendly    | ⚠️       | ✅           |
+| Type-safe       | ❌       | ✅           |
+| Recommended     | ❌       | ✅           |
+
+Use `<Head>` only for **rare edge cases**.
+
+---
+
+# 📌 **15. OpenGraph & Twitter Metadata**
+
+OpenGraph is used by:
+
+- WhatsApp
+- LinkedIn
+- Facebook
+- Discord
+
+```ts
+openGraph: {
+  title: "My Page",
+  description: "Preview description",
+  images: ["https://example.com/og.png"],
+},
+```
+
+Twitter cards:
+
+```ts
+twitter: {
+  card: "summary_large_image",
+  title: "My Page",
+  images: ["https://example.com/og.png"],
+},
+```
+
+---

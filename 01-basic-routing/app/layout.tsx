@@ -1,6 +1,17 @@
-// import "./globals.css";
-
+import { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Learning Basic Routing",
+  description: "Understanding basic folder-based routing in Next.js",
+  openGraph: {
+    title: "Learning Basic Routing",
+    description: "Understanding basic folder-based routing in Next.js",
+    images: [
+      "https://images.pexels.com/photos/674010/pexels-photo-674010.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
+    ],
+  },
+};
 
 export default function RootLayout({
   children,
@@ -26,7 +37,7 @@ export default function RootLayout({
             </li>
           </ul>
         </nav>
-        {children}
+        <main>{children}</main>
       </body>
     </html>
   );
