@@ -84,9 +84,66 @@ headers();
 /todos/[id]
 ```
 
+If Next.js does not know all possible param values at build time, it must render dynamically.
+
 ---
 
-## 5. `revalidate` (ISR – Incremental Static Regeneration)
+## 5. `generateStaticParams` (Dynamic routes → Static pages)
+
+> **`generateStaticParams` tells Next.js all valid route params at build time.**
+
+This allows **dynamic routes** to become **static**.
+
+### Example
+
+```ts
+// app/todos/[id]/page.tsx
+export async function generateStaticParams() {
+  const todos = await getTodos();
+
+  return todos.map((todo) => ({
+    id: String(todo.id),
+  }));
+}
+```
+
+### Effect
+
+- `/todos/[id]` becomes **static**
+- HTML is generated at **build time**
+- Route changes from `ƒ` → `○`
+
+Build output changes from:
+
+```
+ƒ /todos/[id]
+```
+
+to:
+
+```
+○ /todos/1
+○ /todos/2
+○ /todos/3
+```
+
+---
+
+### Important rules for `generateStaticParams`
+
+- Runs **only at build time**
+- Cannot use:
+
+  - `cookies()`
+  - `headers()`
+  - request-specific data
+
+- Params must be **finite and known**
+- Missing params → **404**
+
+---
+
+## 6. `revalidate` (ISR – Incremental Static Regeneration)
 
 ### `revalidate > 0`
 
@@ -98,6 +155,10 @@ export const revalidate = 5;
 - Cached HTML reused
 - Re-generated in background after 5s
 - Best for public data
+
+Works **with** `generateStaticParams`.
+
+---
 
 ### `revalidate = 0`
 
@@ -112,7 +173,7 @@ export const revalidate = 0;
 
 ---
 
-## 6. Priority order (this matters)
+## 7. Priority order (this matters)
 
 If multiple configs exist, **strongest wins**:
 
@@ -128,7 +189,7 @@ One `no-store` fetch can flip an entire route to dynamic.
 
 ---
 
-## 7. Dev mode vs Production (critical)
+## 8. Dev mode vs Production (critical)
 
 ### Dev mode
 
@@ -150,7 +211,7 @@ next build
 
 ---
 
-## 8. Build output symbols (truth table)
+## 9. Build output symbols (truth table)
 
 ```
 ○  Static (build-time HTML)
@@ -161,13 +222,13 @@ Example:
 
 ```
 ○ /revalidate-5
+○ /todos/1
 ƒ /dynamic
-ƒ /todos/[id]
 ```
 
 ---
 
-## 9. When to use what (practical)
+## 10. When to use what (practical)
 
 ### Use STATIC when:
 
@@ -187,13 +248,20 @@ Example:
 - User-specific data
 - Auth/session
 - Real-time data
-- Randomness / timestamps
+- Per-request logic
 
 ---
 
-## 10. Best practice rules
+## 11. Best practice rules
 
 ✔ Prefer static <br>
-✔ Use ISR over dynamic when possible <br>
+✔ Use `generateStaticParams` for dynamic routes with known params <br>
+✔ Combine `generateStaticParams + revalidate` for best performance <br>
 ✔ Push `force-dynamic` as low as possible <br>
 ✔ Trust build output, not dev behavior
+
+---
+
+### One-line mental model (final lock)
+
+> **`generateStaticParams` decides _WHAT pages exist_. <br> > `revalidate` decides _WHEN they update_. <br> > `dynamic/no-store` decides _IF caching is allowed_.**

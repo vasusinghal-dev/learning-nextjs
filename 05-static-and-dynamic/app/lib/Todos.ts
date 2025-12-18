@@ -19,6 +19,14 @@ const getTodos = cache(async (): Promise<Todo[]> => {
   return data.todos;
 });
 
+export const getTodo = async (id: string | number): Promise<Todo> => {
+  await wait(2000);
+  console.log(`Todo ${id} Fetched`);
+  const res = await fetch(`https://dummyjson.com/todos/${id}`);
+  const data: Todo = await res.json();
+  return data;
+};
+
 export default getTodos;
 
 async function wait(duration: number) {
