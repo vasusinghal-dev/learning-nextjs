@@ -143,7 +143,128 @@ to:
 
 ---
 
-## 6. `revalidate` (ISR – Incremental Static Regeneration)
+## 6. `dynamicParams` (Control fallback behavior)
+
+```ts
+export const dynamicParams = false; // default: true
+```
+
+> **`dynamicParams` controls whether params NOT returned by `generateStaticParams` are allowed.**
+
+It does **NOT** control caching.
+It does **NOT** control ISR.
+It controls **what happens when an unknown param is requested**.
+
+---
+
+### Default: `dynamicParams = true`
+
+```ts
+export const dynamicParams = true;
+```
+
+- Params returned by `generateStaticParams` → **static**
+- Any other param → **rendered dynamically**
+
+Example:
+
+```ts
+generateStaticParams() → [{ id: "1" }, { id: "2" }]
+```
+
+Requests:
+
+- `/todos/1` → static
+- `/todos/2` → static
+- `/todos/3` → **dynamic render**
+
+Build output:
+
+```
+○ /todos/1
+○ /todos/2
+ƒ /todos/[id]
+```
+
+This is equivalent to **fallback behavior enabled**.
+
+---
+
+### `dynamicParams = false`
+
+```ts
+export const dynamicParams = false;
+```
+
+- ONLY params returned by `generateStaticParams` are valid
+- Any unknown param → **404**
+- No dynamic fallback
+
+Same example:
+
+```ts
+generateStaticParams() → [{ id: "1" }, { id: "2" }]
+```
+
+Requests:
+
+- `/todos/1` → static
+- `/todos/2` → static
+- `/todos/3` → ❌ 404
+
+Build output:
+
+```
+○ /todos/1
+○ /todos/2
+```
+
+This is equivalent to **strict static routing**.
+
+---
+
+### When to use `dynamicParams = false`
+
+Use when:
+
+- All valid params are known
+- URLs should be strict
+- SEO correctness matters
+- Blog, docs, product pages
+
+Avoid when:
+
+- Params are user-generated
+- IDs are infinite or unknown
+- New content appears without rebuild
+
+---
+
+### Interaction with `revalidate`
+
+```ts
+export const revalidate = 60;
+export const dynamicParams = false;
+```
+
+- Pages are static
+- Content revalidates
+- **New params will NOT appear**
+- Rebuild required for new routes
+
+---
+
+### Mental model (important)
+
+```
+generateStaticParams → WHAT routes exist
+dynamicParams       → allow unknown routes?
+revalidate          → WHEN content updates
+```
+
+---
+
+## 7. `revalidate` (ISR – Incremental Static Regeneration)
 
 ### `revalidate > 0`
 
@@ -173,7 +294,7 @@ export const revalidate = 0;
 
 ---
 
-## 7. Priority order (this matters)
+## 8. Priority order (this matters)
 
 If multiple configs exist, **strongest wins**:
 
@@ -189,7 +310,7 @@ One `no-store` fetch can flip an entire route to dynamic.
 
 ---
 
-## 8. Dev mode vs Production (critical)
+## 9. Dev mode vs Production (critical)
 
 ### Dev mode
 
@@ -211,7 +332,7 @@ next build
 
 ---
 
-## 9. Build output symbols (truth table)
+## 10. Build output symbols (truth table)
 
 ```
 ○  Static (build-time HTML)
@@ -228,7 +349,7 @@ Example:
 
 ---
 
-## 10. When to use what (practical)
+## 11. When to use what (practical)
 
 ### Use STATIC when:
 
@@ -252,7 +373,7 @@ Example:
 
 ---
 
-## 11. Best practice rules
+## 12. Best practice rules
 
 ✔ Prefer static <br>
 ✔ Use `generateStaticParams` for dynamic routes with known params <br>

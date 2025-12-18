@@ -1,5 +1,6 @@
 import getTodos, { getTodo, Todo } from "@/app/lib/Todos";
 
+export const dynamicParams = false;
 export const revalidate = 60;
 
 export async function generateStaticParams() {
